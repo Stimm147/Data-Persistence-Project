@@ -11,6 +11,7 @@ public class MainManager : MonoBehaviour
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public Text PlayerName;
     public GameObject GameOverText;
     
     private bool m_Started = false;
@@ -55,6 +56,7 @@ public class MainManager : MonoBehaviour
         }
         else if (m_GameOver)
         {
+            AddPlayerName();
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
@@ -66,6 +68,26 @@ public class MainManager : MonoBehaviour
     {
         m_Points += point;
         ScoreText.text = $"Score : {m_Points}";
+    }
+
+    void AddPlayerName()
+    {
+        if (GameManager.instance != null && PlayerName != null)
+        {
+            string playerName = GameManager.instance.playerName;
+            PlayerName.text = "Best Score: " + playerName;
+        }
+        else
+        {
+            if (GameManager.instance == null)
+            {
+                Debug.LogError("GameManager.instance jest nullem!");
+            }
+            if (PlayerName == null)
+            {
+                Debug.LogError("PlayerName nie jest przypisany!");
+            }
+        }
     }
 
     public void GameOver()
