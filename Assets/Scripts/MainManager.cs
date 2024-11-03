@@ -19,10 +19,11 @@ public class MainManager : MonoBehaviour
     
     private bool m_GameOver = false;
 
-    
-    // Start is called before the first frame update
+
     void Start()
-    {
+    {   
+        LoadBestScore();
+
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -56,7 +57,8 @@ public class MainManager : MonoBehaviour
         }
         else if (m_GameOver)
         {
-            AddPlayerName();
+            CheckForBestScore();
+            LoadBestScore();
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
@@ -70,29 +72,34 @@ public class MainManager : MonoBehaviour
         ScoreText.text = $"Score : {m_Points}";
     }
 
-    void AddPlayerName()
-    {
-        if (GameManager.instance != null && PlayerName != null)
-        {
-            string playerName = GameManager.instance.playerName;
-            PlayerName.text = "Best Score: " + playerName;
-        }
-        else
-        {
-            if (GameManager.instance == null)
-            {
-                Debug.LogError("GameManager.instance jest nullem!");
-            }
-            if (PlayerName == null)
-            {
-                Debug.LogError("PlayerName nie jest przypisany!");
-            }
-        }
-    }
-
     public void GameOver()
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+    }
+
+    public void CheckForBestScore()
+    {
+        string playerName = GameManager.instance.playerName;
+        int bestScore = PlayerPrefs.GetInt("BestScore", 0);
+        string bestPlayerName = PlayerPrefs.GetString("BestPlayerName", "");
+
+        if (m_Points > bestScore)
+        {
+            PlayerPrefs.SetInt("BestScore", m_Points);
+            PlayerPrefs.SetString("BestPlayerName", playerName);
+            PlayerPrefs.Save();
+        }
+    }
+
+    private void LoadBestScore()
+    {
+        int bestScore = PlayerPrefs.GetInt("BestScore", 0);
+        string bestPlayerName = PlayerPrefs.GetString("BestPlayerName", "None");
+
+        if (PlayerName != null)
+        {
+            PlayerName.text = "Best Score: " + bestPlayerName + " : " + bestScore;
+        }
     }
 }
